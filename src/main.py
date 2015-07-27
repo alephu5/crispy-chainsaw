@@ -14,12 +14,13 @@ class Character(pygame.sprite.Sprite):
         self.position = position
         self.health = 100
         self.moveup = self.moveright = 0
+        self.speed = 10
 
     def update(self, deltaT):
         x, y = self.position
-        x += self.moveright
-        y += self.moveup
-        self.moveright = self.moveleft = 0
+        x += self.moveright * self.speed
+        y += self.moveup * self.speed
+        self.moveright = self.moveup = 0
         self.position = (x, y)
         self.rect = self.image.get_rect()
         self.rect.center = self.position
