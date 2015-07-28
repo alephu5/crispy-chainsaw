@@ -1,15 +1,28 @@
 #! /usr/bin/python3
 
 import pygame
+import pygame.image.load as loadimage
+import sys
 from pygame.locals import KEYDOWN, K_RIGHT, K_LEFT, K_UP, K_DOWN
 
 FRAME_RATE = 30
+
+CHAR_PATH = '../Assets/Chars/'
+
+
+def loadAnims(charName):
+    tree = os.walk(CHAR_PATH + charName)
+    animations = {[]}
+    images = {}
+
+    for _, direction, filenames in tree[1:]:
 
 
 class Character(pygame.sprite.Sprite):
 
     def __init__(self, image, position):
         pygame.sprite.Sprite.__init__(self)
+        self.walkrightImages
         self.image = pygame.image.load(image)
         self.position = position
         self.health = 100
