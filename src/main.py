@@ -11,7 +11,7 @@ import string
 import itertools
 
 FRAME_RATE = 90
-IMAGE_RATE = 45
+IMAGE_RATE = 5
 CHAR_PATH = '../assets/Chars/'
 ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk']
 INIT_IMG = os.path.join('Walk/Down/tile_130.png')
@@ -75,6 +75,7 @@ class Character(pygame.sprite.Sprite):
         if newDir != self.direction:
             if newDir in self.walk.keys():
                 self.images = self.walk[newDir]
+                self.image = self.images.__next__()
                 self.direction = newDir
                 self.obstructed = False
                 self.imageclock = 0
@@ -94,9 +95,9 @@ class Character(pygame.sprite.Sprite):
             if self.direction == K_DOWN:
                 y += self.speed * deltaT
         self.imageclock += deltaT
-        if self.imageclock >=
-        image = self.images.__next__()
-        self.image = image
+        if self.imageclock >= 1000 / self.imagerate:
+            self.image = self.images.__next__()
+            self.imageclock = 0
         self.position = (x, y)
         self.rect = self.image.get_rect()
         self.rect.center = self.position
