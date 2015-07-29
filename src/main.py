@@ -15,7 +15,7 @@ import itertools
 FRAME_RATE = 90
 IMAGE_RATE = 30
 CHAR_PATH = '../assets/Chars/'
-ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk']
+ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk', 'WalkCollsion']
 MUSIC = '../assets/Music/Soliloquy_1.ogg'
 INIT_IMG = os.path.join('Walk/Down/tile_130.png')
 SCREEN_SIZE = 1024, 768
