@@ -4,6 +4,8 @@ import pygame
 from pygame.image import load as loadImage
 from pygame.locals import (K_LEFT, K_RIGHT, K_UP, K_DOWN,
                            K_ESCAPE, QUIT, KEYDOWN, KEYUP)
+import pygame.mixer
+from pygame.mixer import music
 from pytmx.util_pygame import load_pygame
 import pyscroll
 import os
@@ -14,6 +16,7 @@ FRAME_RATE = 90
 IMAGE_RATE = 5
 CHAR_PATH = '../assets/Chars/'
 ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk']
+MUSIC = '../assets/Music/Soliloquy_1.ogg'
 INIT_IMG = os.path.join('Walk/Down/tile_130.png')
 SCREEN_SIZE = 1024, 768
 MAP_PATH = '../assets/base.tmx'
@@ -105,8 +108,9 @@ class Character(pygame.sprite.Sprite):
 
 class Game:
 
-    def __init__(self, screen_size, map):
-        pygame.init
+    def __init__(self, screen_size, map, bgmusic=None):
+        pygame.init()
+        #pygame.mixer.init()
         self.screen_size = screen_size
         self.screen = pygame.display.set_mode(screen_size)
         self.rect = self.screen.get_rect()
@@ -125,6 +129,11 @@ class Game:
         self.group = pyscroll.PyscrollGroup(
             map_layer=map_layer,
             default_layer=1)
+        if bgmusic:
+            self.music = music.load(bgmusic)
+            print(bgmusic)
+        else:
+            self.music = None
 
     def load_obstacles(self):
         """Assumes that all tiles in the foreground block motion. Draws
@@ -175,14 +184,17 @@ class Game:
 
     def start(self, frame_rate):
         self.group.draw(self.screen)
+        music.play(-1)
         self.running = True
         while self.running:
             deltaT = self.clock.tick(frame_rate)
             self.update(deltaT)
+        if self.music:
+            music.stop(self.music)
 
 
 def main():
-    new_game = Game(SCREEN_SIZE, MAP_PATH)
+    new_game = Game(SCREEN_SIZE, MAP_PATH, MUSIC)
     dave = Character('Dave', new_game.rect.center)
     new_game.load_obstacles()
     new_game.addPlayer(dave)
