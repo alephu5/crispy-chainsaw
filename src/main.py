@@ -13,7 +13,7 @@ import string
 import itertools
 
 FRAME_RATE = 90
-IMAGE_RATE = 5
+IMAGE_RATE = 30
 CHAR_PATH = '../assets/Chars/'
 ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk']
 MUSIC = '../assets/Music/Soliloquy_1.ogg'
@@ -55,7 +55,7 @@ class Character(pygame.sprite.Sprite):
         self.position = position
         self.health = 100
         self.direction = None
-        self.speed = 300/1000
+        self.speed = 150/1000
         self.obstructed = False
         baseimg = os.path.join(CHAR_PATH, name, INIT_IMG)
         anims = loadAnims(name)
@@ -79,6 +79,7 @@ class Character(pygame.sprite.Sprite):
             if newDir in self.walk.keys():
                 self.images = self.walk[newDir]
                 self.image = self.images.__next__()
+                self.mask = pygame.mask.from_surface(self.image)
                 self.direction = newDir
                 self.obstructed = False
                 self.imageclock = 0
@@ -110,7 +111,6 @@ class Game:
 
     def __init__(self, screen_size, map, bgmusic=None):
         pygame.init()
-        #pygame.mixer.init()
         self.screen_size = screen_size
         self.screen = pygame.display.set_mode(screen_size)
         self.rect = self.screen.get_rect()
@@ -131,7 +131,6 @@ class Game:
             default_layer=1)
         if bgmusic:
             self.music = music.load(bgmusic)
-            print(bgmusic)
         else:
             self.music = None
 
