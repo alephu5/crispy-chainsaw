@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-import time
+
 import pygame
 from pygame.image import load as loadImage
 from pygame.locals import (K_LEFT, K_RIGHT, K_UP, K_DOWN,
@@ -13,7 +13,7 @@ import string
 import itertools
 
 FRAME_RATE = 90
-IMAGE_RATE = 30
+IMAGE_RATE = 5
 CHAR_PATH = '../assets/Chars/'
 ANIMS = ['Hurt', 'Shoot', 'Slash', 'Spellcast', 'Thrust', 'Walk']
 MUSIC = '../assets/Music/Soliloquy_1.ogg'
@@ -26,7 +26,6 @@ def sortImages(imageSet):
     "Takes an image set and arranges them in animation order."
     ascii = string.punctuation + string.ascii_letters
     trans = str.maketrans('', '', ascii)
-    print(imageSet)
     return sorted(imageSet, key=lambda x: int(x.translate(trans)))
 
 
@@ -37,11 +36,9 @@ def loadAnims(charName):
         images = {}
         path = os.path.join(CHAR_PATH, charName, anim)
         tree = os.walk(path)
-        print(path)
         tree.__next__()
         for dirpath, dirnames, filenames in tree:
             direction = os.path.basename(dirpath)
-            print(direction)
             loadedImgs = [loadImage(os.path.join(path, direction, image))
                           for image in sortImages(filenames)]
             images[os.path.basename(dirpath)] = loadedImgs
@@ -58,7 +55,7 @@ class Character(pygame.sprite.Sprite):
         self.position = position
         self.health = 100
         self.direction = None
-        self.speed = 150/1000
+        self.speed = 300/1000
         self.obstructed = False
         baseimg = os.path.join(CHAR_PATH, name, INIT_IMG)
         anims = loadAnims(name)
@@ -91,29 +88,15 @@ class Character(pygame.sprite.Sprite):
 
     def update(self, deltaT):
         x, y = self.position
-        if self.obstructed:
-            block = -2
-        else:
-            block = 1
         if not self.obstructed:
             if self.direction == K_RIGHT:
-                x += self.speed * deltaT * block
+                x += self.speed * deltaT
             if self.direction == K_LEFT:
-                x -= self.speed * deltaT * block
+                x -= self.speed * deltaT
             if self.direction == K_UP:
-                y -= self.speed * deltaT * block
+                y -= self.speed * deltaT
             if self.direction == K_DOWN:
-                y += self.speed * deltaT * block
-        else:
-            if self.direction == K_RIGHT:
-                x -= self.speed * deltaT * 2
-            if self.direction == K_LEFT:
-                x += self.speed * deltaT * 2
-            if self.direction == K_UP:
-                y += self.speed * deltaT * 2
-            if self.direction == K_DOWN:
-                y -= self.speed * deltaT * 2
-
+                y += self.speed * deltaT
         self.imageclock += deltaT
         if self.imageclock >= 1000 / self.imagerate:
             self.image = self.images.__next__()
@@ -123,12 +106,11 @@ class Character(pygame.sprite.Sprite):
         self.rect.center = self.position
 
 
-
 class Game:
 
     def __init__(self, screen_size, map, bgmusic=None):
         pygame.init()
-        pygame.mixer.init()
+        #pygame.mixer.init()
         self.screen_size = screen_size
         self.screen = pygame.display.set_mode(screen_size)
         self.rect = self.screen.get_rect()
@@ -149,6 +131,7 @@ class Game:
             default_layer=1)
         if bgmusic:
             self.music = music.load(bgmusic)
+            print(bgmusic)
         else:
             self.music = None
 
@@ -176,8 +159,6 @@ class Game:
         if pygame.sprite.spritecollideany(self.player, self.obstacles,
                                           collided=pygame.sprite.collide_mask):
             self.player.obstructed = True
-        else:
-            self.player.obstructed = False
 
         # Check for input and simulate motion.
         for event in pygame.event.get():
@@ -194,7 +175,7 @@ class Game:
                 self.player.changeDirection(None)
             elif event.type == QUIT:
                 self.running = False
-        # Center screen and render.
+        # Test for collisions.
 
         self.group.center(self.player.position)
         self.group.update(deltaT)
@@ -203,13 +184,13 @@ class Game:
 
     def start(self, frame_rate):
         self.group.draw(self.screen)
-        #music.play(-1)
+        music.play(-1)
         self.running = True
         while self.running:
             deltaT = self.clock.tick(frame_rate)
             self.update(deltaT)
         if self.music:
-            music.stop()
+            music.stop(self.music)
 
 
 def main():
