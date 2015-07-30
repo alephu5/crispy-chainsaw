@@ -1,9 +1,9 @@
 #! /usr/bin/python3
-import time
 import pygame
 from pygame.image import load as loadImage
 from pygame.locals import (K_LEFT, K_RIGHT, K_UP, K_DOWN,
                            K_ESCAPE, QUIT, KEYDOWN, KEYUP)
+from pygame.sprite import spritecollideany, collide_mask
 import pygame.mixer
 from pygame.mixer import music
 from pytmx.util_pygame import load_pygame
@@ -20,13 +20,17 @@ MUSIC = '../assets/Music/Soliloquy_1.ogg'
 INIT_IMG = os.path.join('Walk/Down/tile_130.png')
 SCREEN_SIZE = 1024, 768
 MAP_PATH = '../assets/base.tmx'
+START_POSITION = 61*32, 50*32
+BRIDGES = [(57*32, 50*32), (58*32, 50*32), (59*32, 50*32),
+           (60*32, 50*32), (61*32, 50*32)]
+STAIRS = [(48*32, 79*32), (49*32, 79*32), (50*32, 79*32),
+          (51*32, 79*32), (51*32, 82*32), (51*32, 83*32)]
 
 
 def sortImages(imageSet):
     "Takes an image set and arranges them in animation order."
     ascii = string.punctuation + string.ascii_letters
     trans = str.maketrans('', '', ascii)
-    print(imageSet)
     return sorted(imageSet, key=lambda x: int(x.translate(trans)))
 
 
@@ -37,11 +41,9 @@ def loadAnims(charName):
         images = {}
         path = os.path.join(CHAR_PATH, charName, anim)
         tree = os.walk(path)
-        print(path)
         tree.__next__()
         for dirpath, dirnames, filenames in tree:
             direction = os.path.basename(dirpath)
-            print(direction)
             loadedImgs = [loadImage(os.path.join(path, direction, image))
                           for image in sortImages(filenames)]
             images[os.path.basename(dirpath)] = loadedImgs
@@ -92,27 +94,17 @@ class Character(pygame.sprite.Sprite):
     def update(self, deltaT):
         x, y = self.position
         if self.obstructed:
-            block = -2
+            block = -1.1
         else:
             block = 1
-        if not self.obstructed:
-            if self.direction == K_RIGHT:
-                x += self.speed * deltaT * block
-            if self.direction == K_LEFT:
-                x -= self.speed * deltaT * block
-            if self.direction == K_UP:
-                y -= self.speed * deltaT * block
-            if self.direction == K_DOWN:
-                y += self.speed * deltaT * block
-        else:
-            if self.direction == K_RIGHT:
-                x -= self.speed * deltaT * 2
-            if self.direction == K_LEFT:
-                x += self.speed * deltaT * 2
-            if self.direction == K_UP:
-                y += self.speed * deltaT * 2
-            if self.direction == K_DOWN:
-                y -= self.speed * deltaT * 2
+        if self.direction == K_RIGHT:
+            x += self.speed * deltaT * block
+        if self.direction == K_LEFT:
+            x -= self.speed * deltaT * block
+        if self.direction == K_UP:
+            y -= self.speed * deltaT * block
+        if self.direction == K_DOWN:
+            y += self.speed * deltaT * block
 
         self.imageclock += deltaT
         if self.imageclock >= 1000 / self.imagerate:
@@ -121,7 +113,6 @@ class Character(pygame.sprite.Sprite):
         self.position = (x, y)
         self.rect = self.image.get_rect()
         self.rect.center = self.position
-
 
 
 class Game:
@@ -146,7 +137,7 @@ class Game:
             clamp_camera=True)
         self.group = pyscroll.PyscrollGroup(
             map_layer=map_layer,
-            default_layer=1)
+            default_layer=2)
         if bgmusic:
             self.music = music.load(bgmusic)
         else:
@@ -155,14 +146,16 @@ class Game:
     def load_obstacles(self):
         """Assumes that all tiles in the foreground block motion. Draws
         rectangles around each tile and creates a collision map."""
-        for tile in self.map.layers[1].tiles():
-            x, y, img = tile
-            obstacle = pygame.sprite.Sprite()
-            obstacle.rect = img.get_rect()
-            # Multiply by 32 because the tiles are 32x32 across.
-            obstacle.rect.center = (x*32, y*32)
-            obstacle.mask = pygame.mask.from_surface(img)
-            self.obstacles.add(obstacle)
+        for layer in self.map.layers:
+            if 'foreground' in layer.name.casefold():
+                for tile in layer.tiles():
+                    x, y, img = tile
+                    obstacle = pygame.sprite.Sprite()
+                    obstacle.rect = img.get_rect()
+                    # Multiply by 32 because the tiles are 32x32 across.
+                    obstacle.rect.center = (x*32, y*32)
+                    obstacle.mask = pygame.mask.from_surface(img)
+                    self.obstacles.add(obstacle)
 
     def addPlayer(self, character):
         self.player = character
@@ -173,11 +166,14 @@ class Game:
         # Check for collision and block motion if true. When the direction
         # changes, allow the player to take one step before checking
         # for collision.
-        if pygame.sprite.spritecollideany(self.player, self.obstacles,
-                                          collided=pygame.sprite.collide_mask):
-            self.player.obstructed = True
-        else:
+        if self.player.position in BRIDGES + STAIRS:
             self.player.obstructed = False
+        else:
+            if spritecollideany(self.player, self.obstacles,
+                                collided=collide_mask):
+                self.player.obstructed = True
+            else:
+                self.player.obstructed = False
 
         # Check for input and simulate motion.
         for event in pygame.event.get():
@@ -203,7 +199,7 @@ class Game:
 
     def start(self, frame_rate):
         self.group.draw(self.screen)
-        #music.play(-1)
+        music.play(-1)
         self.running = True
         while self.running:
             deltaT = self.clock.tick(frame_rate)
@@ -214,7 +210,7 @@ class Game:
 
 def main():
     new_game = Game(SCREEN_SIZE, MAP_PATH, MUSIC)
-    dave = Character('Dave', new_game.rect.center)
+    dave = Character('John', START_POSITION)
     new_game.load_obstacles()
     new_game.addPlayer(dave)
     new_game.start(FRAME_RATE)

@@ -1,4 +1,5 @@
 #! /usr/bin/bash
+convert $1 -crop 64x64 +repage +adjoin tile_%02d.png 
 
 # Walk
 mkdir Down
