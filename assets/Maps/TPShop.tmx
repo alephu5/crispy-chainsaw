@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="12" height="6" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="city_inside" tilewidth="32" tileheight="32">
+  <image source="Landscape/LPC_city_inside/city_inside.png" width="768" height="512"/>
+ </tileset>
+ <tileset firstgid="385" name="House Objects 1 Revised_2" tilewidth="32" tileheight="32">
+  <image source="Landscape/House Objects 1 Revised_2.png" width="192" height="192"/>
+ </tileset>
+ <tileset firstgid="421" name="obj_misk_atlas" tilewidth="32" tileheight="32">
+  <image source="Landscape/obj_misk_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="1445" name="build_atlas" tilewidth="32" tileheight="32">
+  <image source="Landscape/build_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="2469" name="Interior-Furniture" tilewidth="32" tileheight="32">
+  <image source="Props/Skorpios/Interior-Furniture.png" width="512" height="512"/>
+ </tileset>
+ <layer name="Background" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJy7y8jAcHcI4Ao2TEwPewHMnTyR
+  </data>
+ </layer>
+ <layer name="Background2" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYBj8oJyNgcGbmYHBh5n+dgMAhfwBGw==
+  </data>
+ </layer>
+ <layer name="Foreground" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYGBg2MLEAAchrBD6LiMDTuDOimCXsOJWhw2A1IPMBuENQDYXG0QcRm/lZGAQ4GJg2M5JnPlHgeqOAfFxNPX43I8MpiC5BxsAAF8eDec=
+  </data>
+ </layer>
+ <layer name="Foreground2" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAtWMrJwLAMiJdzQviroHQEG249U1hxy/EwMzDwArEvM0KsHUk9zHxqAQAnBwVm
+  </data>
+ </layer>
+ <layer name="Foreground3" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAt2MXJwLAbiFdxEqd+K1CdABcDw3Yi1dMaAACC9wPT
+  </data>
+ </layer>
+ <layer name="Top" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA/CGdjYIjAgqPYSDOnikT1+EAKOwPDalaGBBBGFgcA/LIFnw==
+  </data>
+ </layer>
+ <layer name="Top 2" width="12" height="6">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF+AAAASAAAQ==
+  </data>
+ </layer>
+</map>
